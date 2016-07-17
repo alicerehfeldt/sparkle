@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+.box {
+  background-color: #ff00ff;
+  width: 200px;
+  height: 200px;
+  margin: 50px auto;
+}
+    </style>
+  </head>
+  <body>
+    <div class="box"></div>
+    <script>
+(function(){
+  var box = document.querySelector('div.box');
+  var sparkle = new Sparkle({
+    anchor: box,
+    size: [300, 300]
+  });
+  console.log('sparkle', sparkle);
+  sparkle.start(1);
+})();
+    </script>
+  </body>
+</html>
