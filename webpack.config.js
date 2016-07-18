@@ -37,11 +37,11 @@ module.exports = {
       inject: 'head',
       template: 'index.ejs'
     }),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
-    })
+    // new webpack.optimize.UglifyJsPlugin({
+    //   compress: {
+    //     warnings: false
+    //   }
+    // })
   ]
 
 }
