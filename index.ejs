@@ -3,13 +3,13 @@
   <head>
     <style>
 body {
-  background-color: #ff00ff;
+  background-color: yellow;
 }
 
 .box {
   width: 300px;
   height: 300px;
-  margin: 200px auto;
+  margin: 150px auto;
 }
     </style>
   </head>
@@ -18,12 +18,28 @@ body {
     <script>
 (function(){
   var box = document.querySelector('div.box');
+
+  let type = 'blink';
+  let duration = false;
+  let typeMatch = location.search.match(/type=([^&]+)/)
+  if (typeMatch) {
+    type = typeMatch[1];
+  }
+
+  let durationMatch = location.search.match(/duration=([0-9]+)/)
+  if (durationMatch) {
+    duration = parseInt(durationMatch[1], 10);
+  }
+
+
   var sparkle = new Sparkle({
     anchor: box,
-    size: [500, 500]
+    type: type,
+    color: '#ff00ff',
+    intensity: 3,
+    maxAlpha: 1
   });
-  console.log('sparkle', sparkle);
-  sparkle.start(10);
+  sparkle.start(duration);
 })();
     </script>
   </body>
