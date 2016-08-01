@@ -19,8 +19,8 @@ body {
 (function(){
   var box = document.querySelector('div.box');
 
-  let type = 'blink';
-  let duration = false;
+  let type = 'test';
+  let duration = 6;
   let typeMatch = location.search.match(/type=([^&]+)/)
   if (typeMatch) {
     type = typeMatch[1];
@@ -36,7 +36,6 @@ body {
     anchor: box,
     type: type,
     color: '#ff00ff',
-    intensity: 3,
     maxAlpha: 1
   });
   sparkle.start(duration);

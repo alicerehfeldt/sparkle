@@ -12,6 +12,8 @@
     "webpack-dev-server": "^1.14.1"
   },
   "dependencies": {
+    "bezier-easing": "^2.0.3",
+    "lerp": "^1.0.3",
     "tinycolor2": "^1.4.1"
   }
 }

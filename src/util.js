@@ -1,4 +1,16 @@
+import BezierEasing from 'bezier-easing';
+
 class Util {
+  constructor() {
+    this.curves = {
+      'linear': new BezierEasing(0, 0, 1, 1),
+      'ease-in': new BezierEasing(0.42, 0, 1, 1),
+      'ease-out': new BezierEasing(0, 0, .58, 1),
+      'ease-in-out': new BezierEasing(.42, 0, .58, 1)
+    }
+  }
+
+
   defaults(base, override) {
     for (let key in override) {
       if (override.hasOwnProperty(key)) {
@@ -27,6 +39,23 @@ class Util {
   randAngle() {
     let angle = [0,15,45,75][this.rand(0, 3)];
     return angle;
+  }
+
+  easing(from, to, p, curve = 'linear') {
+    if (!this.curves[curve]) {
+      throw new Error(`easing curve "${curve}" not supported`);
+    }
+
+    let delta = this.curves[curve](p);
+
+    if (Array.isArray(from)) {
+      return [
+        (((to[0] - from[0]) * delta) + from[0]),
+        (((to[1] - from[1]) * delta) + from[1])
+      ]
+    } else {
+      return (((to - from) * delta) + from);
+    }
   }
 
 
