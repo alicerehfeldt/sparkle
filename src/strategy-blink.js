@@ -1,7 +1,8 @@
-import Strategy from 'strategy';
-import util from 'util';
-import shapes from 'shapes';
-import layout from 'layout';
+import Strategy from './strategy';
+import util from './util';
+import {Circle, FourStar, FiveStar} from './shapes';
+import ShapeSet from './set';
+import layout from './layout';
 import tinycolor from 'tinycolor2';
 
 class Blink extends Strategy {
@@ -35,23 +36,23 @@ class Blink extends Strategy {
     switch (this.config.intensity) {
       case 3:
         return {
-          boxSize: [100, 100],
-          bigStarSize: [40, 60],
+          boxSize: [150, 150],
+          bigStarSize: [30, 50],
           numSmallStars: 3,
           numCircles: 3
         }
         break;
       case 2: 
         return {
-          boxSize: [120, 120],
-          bigStarSize: [30, 50],
+          boxSize: [200, 200],
+          bigStarSize: [20, 40],
           numSmallStars: 2,
           numCircles: 3
         }
         break;
       default:
         return {
-          boxSize: [140, 140],
+          boxSize: [250, 250],
           bigStarSize: [20, 40],
           numSmallStars: 2,
           numCircles: 3
@@ -68,19 +69,8 @@ class Blink extends Strategy {
     layout.grid(this.config.size, gridSettings.boxSize, (boxBase, boxSize) => {
       for (let setNum = 0; setNum < count; setNum++) {
         if (!sets[setNum]) {
-          sets[setNum] = {
-            borders: [],
-            fourStars: [],
-            fiveStars: [],
-            circles: []
-          } 
+          sets[setNum] = new ShapeSet
         }
-
-        sets[setNum].borders.push(
-        {
-          base: boxBase,
-          size: boxSize
-        });
 
         let boxBottomRight = [
           boxBase[0] + boxSize[0],
@@ -88,42 +78,41 @@ class Blink extends Strategy {
         ];
 
         // put a big five star somewhere in the box
-        let bigStar = {
-          pos: util.randPosition([0,0], boxSize, boxBase),
+        let bigStar = new FiveStar({
+          position: util.randPosition([0,0], boxSize, boxBase),
           size: util.rand(gridSettings.bigStarSize[0], 
             gridSettings.bigStarSize[1]),
           angle: util.randAngle(),
-          alpha: util.randAlpha(0.7, 1, this.config.maxAlpha),
+          alpha: util.randAlpha(0.6, 1, this.config.maxAlpha),
           color: color
-        }
+        });
 
         util.ensureVisible(bigStar, boxBase, boxBottomRight);
-        sets[setNum].fiveStars.push(bigStar);
+        sets[setNum].push(bigStar);
 
-        // Generate small stars
+        // Generate small four stars
         for (let k = 0; k < gridSettings.numSmallStars; k++) {
-        // put a big four star somewhere in the box
-          let shape = {
-            pos: util.randPosition([0,0], boxSize, boxBase),
+          let shape = new FourStar({
+            position: util.randPosition([0,0], boxSize, boxBase),
             size: util.rand(10,30),
             angle: util.randAngle(),
             alpha: util.randAlpha(0.5, 0.7, this.config.maxAlpha),
             color: color
-          }
+          });
           util.ensureVisible(shape, [0,0], this.config.size);
-          sets[setNum].fourStars.push(shape);
+          sets[setNum].push(shape);
         }
 
         // Generate circles
         for (let k = 0; k < gridSettings.numCircles; k++) {
-          let shape = {
-            pos: util.randPosition([0,0], boxSize, boxBase),
+          let shape = new Circle({
+            position: util.randPosition([0,0], boxSize, boxBase),
             size: util.rand(10,30),
             alpha: util.randAlpha(0.2, 0.4, this.config.maxAlpha),
             color: color
-          }
+          });
           util.ensureVisible(shape, [0,0], this.config.size);
-          sets[setNum].circles.push(shape);
+          sets[setNum].push(shape);
         }
       }
     });
@@ -132,14 +121,9 @@ class Blink extends Strategy {
   }
 
   createRandomSets(count, color) {
-    let sets = [];
+    let sets = []
     for (let i = 0; i < count; i++) {  
-      let set = {
-        circles: [],
-        fourStars: [],
-        fiveStars: [],
-        borders: []
-      }
+      let set = new ShapeSet();
       let numCircles = 10;
       let numFourStars = 30;
       for (let j = 0; j < numCircles; j++) {
@@ -147,35 +131,30 @@ class Blink extends Strategy {
         let maxSize = 30;
         let size = util.rand(minSize, maxSize);
 
-        let shape = {
-          pos: util.randPosition([0,0], this.config.size),
+        let shape = new Circle({
+          position: util.randPosition([0,0], this.config.size),
           size: size,
           alpha: 0.4,
           color: color
-        }
+        })
         util.ensureVisible(shape, [0,0], this.config.size);
-        set.circles.push(shape);
+        set.push(shape);
       }
       for (let j = 0; j < numFourStars; j++) {
         let minSize = 10;
         let maxSize = 50;
         let maxAngle = 45
         let size = util.rand(minSize, maxSize);
-        let shape = {
-          pos: util.randPosition([0,0], this.config.size),
+        let shape = new FourStar({
+          position: util.randPosition([0,0], this.config.size),
           size: size,
           angle: util.randAngle(),
           alpha: 0.8,
           color: color
-        }
+        });
 
         util.ensureVisible(shape, [0,0], this.config.size);
-        if (util.rand(0,2) === 2) {
-          set.fiveStars.push(shape);
-        } else {
-          set.fourStars.push(shape);          
-        }
-
+        set.push(shape);
       }
       sets.push(set);
     }
@@ -206,31 +185,7 @@ class Blink extends Strategy {
   draw(set) {
     let ctx = this.canvas.getContext('2d');
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-    for (let i = 0; i < set.circles.length; i++) {
-      let circle = set.circles[i];
-      shapes.drawCircle(ctx, circle);
-    }
-
-    for (let i = 0; i < set.fourStars.length; i++) {
-      let fourStar = set.fourStars[i];
-      shapes.drawFourStar(ctx, fourStar);
-    }
-
-    for (let i = 0; i < set.fiveStars.length; i++) {
-      let fiveStar = set.fiveStars[i];
-      shapes.drawFiveStar(ctx, fiveStar);
-      if (this.config.debug) {
-        shapes.drawShapeBorder(ctx, fiveStar, i);        
-      }
-    }
-
-    if (this.config.debug) {
-      for (let i = 0; i < set.borders.length; i++) {
-        let border = set.borders[i];
-        shapes.drawBorder(ctx, border, i);
-      }
-    }
+    set.frame(ctx);
   }
 }
 

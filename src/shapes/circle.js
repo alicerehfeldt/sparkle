@@ -8,8 +8,13 @@ class Circle extends Shape {
     ctx.globalAlpha = this.alpha;
     ctx.beginPath();
     ctx.arc(this.position[0], this.position[1], radius, 0, 2 * Math.PI);
-    ctx.fillStyle = this.color;
-    ctx.fill();
+    if (this.fill) {
+        ctx.fillStyle = this.color;
+        ctx.fill();
+    } else {
+        ctx.strokeStyle = this.color;
+        ctx.stroke();
+    }
     ctx.restore();
   }
 

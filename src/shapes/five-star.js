@@ -9,7 +9,6 @@ class FiveStar extends Shape {
     ctx.scale(scale, scale)
     ctx.rotate((this.angle * Math.PI) / 180)
     ctx.globalAlpha = this.alpha;
-    ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.moveTo(0, -10); // top
     ctx.lineTo(3.5, -3.5);
@@ -22,7 +21,13 @@ class FiveStar extends Shape {
     ctx.lineTo(-10,-2.5); // mid left
     ctx.lineTo(-3.5,-3.5);
     ctx.closePath();
-    ctx.fill();
+    if (this.fill) {
+        ctx.fillStyle = this.color;
+        ctx.fill();
+    } else {
+        ctx.strokeStyle = this.color;
+        ctx.stroke();
+    }
     ctx.restore();
   }
 

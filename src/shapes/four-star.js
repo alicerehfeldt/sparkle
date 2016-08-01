@@ -9,14 +9,17 @@ class FourStar extends Shape {
     ctx.scale(scale, scale)    
     ctx.rotate((this.angle * Math.PI) / 180)
     ctx.globalAlpha = this.alpha;
-    ctx.fillStyle = this.color;
+
     ctx.beginPath();
     ctx.moveTo(0,-5);
-    ctx.bezierCurveTo(0,0,0,0,-5,0)
-    ctx.bezierCurveTo(0,0,0,0,0,5)
-    ctx.bezierCurveTo(0,0,0,0,5,0)
-    ctx.bezierCurveTo(0,0,0,0,0,-5)
+    ctx.bezierCurveTo(0,0,0,0,-5,0);
+    ctx.bezierCurveTo(0,0,0,0,0,5);
+    ctx.bezierCurveTo(0,0,0,0,5,0);
+    ctx.bezierCurveTo(0,0,0,0,0,-5);
+
+    ctx.fillStyle = this.color;
     ctx.fill();
+
     ctx.restore();
   }
 

@@ -20,7 +20,7 @@ body {
   var box = document.querySelector('div.box');
 
   let type = 'test';
-  let duration = 6;
+  let duration = false;
   let typeMatch = location.search.match(/type=([^&]+)/)
   if (typeMatch) {
     type = typeMatch[1];
@@ -36,6 +36,8 @@ body {
     anchor: box,
     type: type,
     color: '#ff00ff',
+    layout: 'grid',
+    intensity: 1,
     maxAlpha: 1
   });
   sparkle.start(duration);

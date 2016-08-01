@@ -8,6 +8,7 @@ class Util {
       'ease-out': new BezierEasing(0, 0, .58, 1),
       'ease-in-out': new BezierEasing(.42, 0, .58, 1)
     }
+    window.curves = this.curves;
   }
 
 
@@ -50,11 +51,11 @@ class Util {
 
     if (Array.isArray(from)) {
       return [
-        (((to[0] - from[0]) * delta) + from[0]),
-        (((to[1] - from[1]) * delta) + from[1])
+        from[0] + ((to[0] - from[0]) * delta),
+        from[1] + ((to[1] - from[1]) * delta)
       ]
     } else {
-      return (((to - from) * delta) + from);
+      return (from + ((to - from) * delta));
     }
   }
 
@@ -62,21 +63,21 @@ class Util {
   ensureVisible(shape, upperLeft = [0,0], bottomRight = [500, 500]) {
     let radius = shape.size / 2;
 
-    let leftBound = shape.pos[0] - radius;
-    let rightBound = shape.pos[0] + radius;
-    let topBound = shape.pos[1] - radius;
-    let bottomBound = shape.pos[1] + radius;
+    let leftBound = shape.position[0] - radius;
+    let rightBound = shape.position[0] + radius;
+    let topBound = shape.position[1] - radius;
+    let bottomBound = shape.position[1] + radius;
 
     if (leftBound < upperLeft[0]) {
-      shape.pos[0] += upperLeft[0] - leftBound;
+      shape.position[0] += upperLeft[0] - leftBound;
     } else if (rightBound > bottomRight[0]) {
-      shape.pos[0] -= rightBound - bottomRight[0];
+      shape.position[0] -= rightBound - bottomRight[0];
     }
 
     if (topBound < upperLeft[1]) {
-      shape.pos[1] += upperLeft[1] - topBound;
+      shape.position[1] += upperLeft[1] - topBound;
     } else if (bottomBound > bottomRight[1]) {
-      shape.pos[1] -= bottomBound - bottomRight[1];
+      shape.position[1] -= bottomBound - bottomRight[1];
     }
   }
 }

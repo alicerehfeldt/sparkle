@@ -10,10 +10,12 @@ class Shape {
     this.alpha = config.alpha;
     this.color = config.color;
     this.spinDPS = config.spinDPS;
+    this.fill = config.fill;
     this.moving = false;
     this.rotating = false;
     this.spinning = false;
     this.fading = false;
+    this.transitionProperties = new Map();
   }
 
   defaults() {
@@ -23,7 +25,8 @@ class Shape {
       size: 10,
       alpha: 1, 
       color: '#ff00ff',
-      spinDPS: 90
+      spinDPS: 90,
+      fill: true
     }
   }
 
@@ -36,11 +39,14 @@ class Shape {
       this.draw(ctx);      
     }
     let now = Date.now();
-    let actions = ['moving', 'rotating', 'spinning', 'fading']
+    let actions = ['moving', 'rotating', 'spinning', 'fading'];
     actions.forEach((key) => {
       if (this[key] !== false) {
         this[key](now);
       }
+    });
+    this.transitionProperties.forEach((callback) => {
+      callback(now);
     });
   }
 
@@ -66,32 +72,9 @@ class Shape {
     });
   }
 
-  rotate(to, duration = 1000, curve = 'linear') {
+  spin(clockwise = true, numSpins = false) {
     return new Promise((resolve, reject) => {
-      if (this.spinning !== false || this.rotating !== false) {
-        reject();
-        return;
-      }
-
-      let from = this.angle;
-      let startTime = Date.now();
-      let endTime = startTime + duration;
-
-      this.rotating = (now) => {
-        if (now > endTime) {
-          this.rotating = false;
-          resolve(this);
-          return;
-        }
-        let p = (now - startTime) / duration;
-        this.angle = util.easing(from, to, p, curve);
-      }
-    });
-  }
-
-  spin(numSpins = false) {
-    return new Promise((resolve, reject) => {
-      if (this.spinning !== false || this.rotating !== false) {
+      if (this.spinning !== false || this.transitionProperties.has('angle')) {
         reject();
         return;
       }
@@ -117,9 +100,15 @@ class Shape {
           }
         }
 
+        if (!clockwise) {
+          delta = delta * -1;
+        }
+
         let newAngle = this.angle + delta;
         if (newAngle > 360) {
           newAngle -= 360;
+        } else if ( newAngle < 0 ) {
+          newAngle += 360;
         }
         this.angle = newAngle;
         spinTick = now;
@@ -130,25 +119,27 @@ class Shape {
     });
   }
 
-  fade(to, duration = 1000, curve = 'linear') {
+  transition(property, to, duration = 0, curve = 'linear') {
     return new Promise((resolve, reject) => {
-      if (this.fading !== false) {
+      duration = parseInt(duration, 10);
+      if (this.transitionProperties.has(property)) {
         reject();
         return;
       }
 
-      let from = this.alpha;
+      let from = this[property];
       let startTime = Date.now();
       let endTime = startTime + duration;
-      this.fading = (now) => {
+      let callback = (now) => {
         if (now > endTime) {
-          this.fading = false;
+          this.transitionProperties.delete(property);
           resolve(this);
           return;
         }
         let p = (now - startTime) / duration;
-        this.alpha = util.easing(from, to, p, curve);
+        this[property] = util.easing(from, to, p, curve);
       }
+      this.transitionProperties.set(property, callback);
     });
   }
 }
